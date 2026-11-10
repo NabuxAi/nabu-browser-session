@@ -1,0 +1,73 @@
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[project]
+name = "nabu_browser_session"
+version = "0.1.0"
+description = "Unofficial, slow-paced browser sessions shared by Nabux social and messaging MCP gateways."
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.11"
+authors = [{ name = "NabuxAI" }]
+keywords = [
+    "mcp",
+    "playwright",
+    "browser",
+    "session",
+    "unofficial",
+    "nabux",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Typing :: Typed",
+    "Topic :: Software Development :: Libraries",
+]
+dependencies = [
+    "cryptography>=42.0",
+    "httpx>=0.27.0",
+    "playwright==1.65.0",
+]
+
+[project.optional-dependencies]
+# Lightpanda itself is an external binary reached over CDP (LIGHTPANDA_CDP_URL).
+# The extra is intentional so gateways can write:
+#   nabu_browser_session[lightpanda] @ git+https://github.com/NabuxAi/nabu-browser-session@v0.1.0
+# Playwright, which speaks CDP, is already a core dependency.
+lightpanda = []
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.23",
+]
+
+[project.urls]
+Homepage = "https://github.com/NabuxAi/nabu-browser-session"
+Repository = "https://github.com/NabuxAi/nabu-browser-session"
+Changelog = "https://github.com/NabuxAi/nabu-browser-session/blob/main/CHANGELOG.md"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/nabu_browser_session"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/src",
+    "/tests",
+    "/examples",
+    "/docker",
+    "/README.md",
+    "/CHANGELOG.md",
+    "/LICENSE",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+addopts = "-q"
+pythonpath = ["src"]
