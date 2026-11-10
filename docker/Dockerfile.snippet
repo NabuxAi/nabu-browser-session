@@ -1,0 +1,31 @@
+# Copy into a gateway image (Python 3.11, same base the other Nabux MCP
+# gateways use). Official API routes are unchanged. This installs Chromium
+# for the UNOFFICIAL browser-login path.
+#
+# Lightpanda is not installed here. Run it separately and set
+# BROWSER_ENGINE=lightpanda plus LIGHTPANDA_CDP_URL only for light reads
+# and downloads. Login and upload stay on Chromium automatically.
+
+FROM python:3.11-slim
+
+WORKDIR /app
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    DATA_DIR=/data \
+    SESSION_DIR=/data/browser-sessions \
+    BROWSER_ENGINE=chromium \
+    NABU_BROWSER_HEADLESS=1
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir --upgrade pip \
+ && pip install --no-cache-dir -r requirements.txt \
+ && python -m playwright install --with-deps chromium
+
+# requirements.txt line (pin the tag; do not float main in production):
+#   nabu_browser_session @ git+https://github.com/NabuxAi/nabu-browser-session@v0.1.0
+#
+# Generate the Fernet key once and keep it on the same volume as SESSION_DIR:
+#   python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+#   NABU_SESSION_FERNET_KEY=<that value>
+
+VOLUME ["/data"]
